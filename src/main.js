@@ -1,8 +1,19 @@
 import { Pane } from './pane.js';
 
-// 免登录、可直接热链的示例模型，用来先验证查看器本身是通的。
-// V-22 得去 Sketchfab 下（要登录），下完拖进来即可 —— 见 README。
+// 免登录、可直接热链的示例模型。
+// Sketchfab 上那几个 V-22 都要登录才能下，没法写死 URL；下面这个 V-22 是有人把
+// CC-BY 的 Sketchfab 导出提交进了公开 GitHub 仓库，才得以直接 fetch。
+// 用 jsDelivr 并锁定 commit：那是个私人仓库，主分支随时可能被改写或删掉。
+const V22 =
+  'https://cdn.jsdelivr.net/gh/cvntrieu/Combat360@056d88a1ae5549ada31caa74a12b33810212ccdc/models/V22/scene.gltf';
+
 const SAMPLES = [
+  {
+    label: 'V-22 鱼鹰',
+    url: V22,
+    // CC-BY 要求署名，这行不能删
+    credit: 'V-22 模型 © Muhamad Mirza Arrafi，CC-BY-4.0',
+  },
   {
     label: '小飞机（Cesium Air）',
     url: 'https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/models/CesiumAir/Cesium_Air.glb',
@@ -80,7 +91,7 @@ class App {
     for (const s of SAMPLES) {
       const b = document.createElement('button');
       b.textContent = s.label;
-      b.addEventListener('click', () => pane.loadURL(s.url));
+      b.addEventListener('click', () => pane.loadURL(s.url, s.credit));
       samples.appendChild(b);
     }
     el.querySelector('.empty').appendChild(samples);

@@ -94,12 +94,13 @@ export class Pane {
     });
   }
 
-  async loadURL(url) {
+  async loadURL(url, credit) {
     this.el.querySelector('.url').value = url;
     await this.#load(
       (onProgress) => loadFromURL(url, this.renderer, onProgress),
       url.split('/').pop().split('?')[0],
       url,
+      credit,
     );
   }
 
@@ -111,7 +112,7 @@ export class Pane {
     );
   }
 
-  async #load(run, fallbackName, source) {
+  async #load(run, fallbackName, source, credit) {
     this.#clearModel();
     this.loadingEl.hidden = false;
     this.pctEl.textContent = '0%';
@@ -152,6 +153,7 @@ export class Pane {
       renderReport(this.reportEl, {
         name: result.name ?? fallbackName ?? '模型',
         source,
+        credit,
         loadMs,
         stats: this.stats,
       });

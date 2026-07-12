@@ -33,7 +33,7 @@ const load = async (paneIdx, sampleIdx) => {
 };
 
 await load(0, 0);
-await load(1, 1);
+await load(1, 2);
 
 // 等两栏的报告都渲染出来
 await page.waitForFunction(

@@ -190,10 +190,15 @@ function judge(s) {
     say('bad', '整个模型是一整块网格，没有骨骼也没有部件划分，任何部位都动不了');
   }
 
-  // 尺度：glTF 的约定单位是米。一架 V-22 长约 17 米。
+  // 尺度：glTF 约定 1 单位 = 1 米。一架 V-22 长约 17 米，最大的客机也就 80 米，
+  // 所以最长边超过 200 基本可以断定不是米制（多半是从 3ds Max/厘米/英寸导出的）。
+  // 这类模型单看没问题，一旦和别的模型放进同一场景就会大得离谱。
   const maxDim = Math.max(s.size.x, s.size.y, s.size.z);
-  if (maxDim > 0 && (maxDim < 0.05 || maxDim > 1000)) {
-    say('warn', `包围盒最长边 ${maxDim.toPrecision(3)} 单位，尺度不合常规（glTF 约定 1 单位 = 1 米），跟其他模型混用时要缩放`);
+  if (maxDim > 0 && (maxDim < 0.05 || maxDim > 200)) {
+    say(
+      'warn',
+      `包围盒最长边 ${maxDim.toPrecision(3)} 单位，不是米制（glTF 约定 1 单位 = 1 米），和其他模型混用前必须先缩放`,
+    );
   }
 
   return notes;

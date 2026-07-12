@@ -14,13 +14,14 @@ const MAP_LABELS = {
   displacementMap: '置换',
 };
 
-export function renderReport(el, { name, source, loadMs, stats: s }) {
+export function renderReport(el, { name, source, credit, loadMs, stats: s }) {
   const grade = overallGrade(s.notes);
   const maps = [...s.usedMaps].map((k) => MAP_LABELS[k] ?? k);
 
   el.innerHTML = `
     <h2>${esc(name)}<span class="grade ${grade.level}">${grade.label}</span></h2>
     <div class="sub">${esc(source)} · 加载耗时 ${Math.round(loadMs)} ms</div>
+    ${credit ? `<div class="credit">${esc(credit)}</div>` : ''}
 
     <div class="sec">几何体</div>
     <table>
