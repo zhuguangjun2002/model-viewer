@@ -18,9 +18,35 @@ npm run dev
 `sketchfab.com/3d-models/bell-boeing-v-22-osprey-28c5c68b96714104839f277ff76bc4fb`（作者 Araon）
 是 view-only 的，页面上没有下载入口，只能在线预览。
 
-### 内置的 V-22 示例
+### 内置的 V-22 示例（可动）
 
-第一个示例按钮就是一架真 V-22（11,686 面，带贴图），点了就能看。
+**第一个示例按钮是一架能变形的 V-22。** 拖「短舱倾转」滑杆，0° 是直升机模式
+（旋翼朝上），90° 是飞机模式（旋翼朝前），旋翼、桨叶、桨毂全跟着走。
+另外还有机翼折叠、旋翼自转、起落架、货舱门，共 10 个可动部件。
+
+它来自 **FlightGear 的开源 V-22**（GPL v2），用 `tools/ac3d_to_gltf.py` 转成 glTF。
+FlightGear 的模型分两份：`.ac` 是几何体，`.xml` 是动画定义——后者写明了
+哪个部件绕哪根轴、以哪个点为中心旋转。**这才是真正值钱的东西**：短舱倾转的
+枢轴点和旋转轴在 xml 里写得清清楚楚，不用去猜。
+
+转换器把这些旋转组还原成 glTF 里的嵌套枢轴节点
+（机翼 → 短舱 → 旋翼 → 单片桨叶），并把旋转轴写进节点的 `extras`，
+前端读 `object.userData.fgAxis` 就能拿到，不硬编码任何方向。
+
+重新转换（需要装了 Blender；Windows 上的 Blender 可以从 WSL 直接驱动）：
+
+```bash
+git clone --depth 1 https://github.com/FGMEMBERS/V22-Osprey.git
+BL="/mnt/c/Program Files/Blender Foundation/Blender 5.1/blender.exe"
+"$BL" --background --python "$(wslpath -w tools/ac3d_to_gltf.py)" -- \
+  "$(wslpath -w V22-Osprey/Models/v22.ac)" \
+  "$(wslpath -w V22-Osprey/Models/v22.xml)" \
+  "$(wslpath -w public/models/v22-fg.glb)"
+```
+
+### 另一个 V-22 示例（静态）
+
+第二个示例按钮是一架 V-22（11,686 面，带贴图），能看不能动。
 
 它能免登录直接加载，是因为有人把一个 CC-BY 的 Sketchfab 导出提交进了公开 GitHub 仓库
 （`cvntrieu/Combat360`），我们通过 jsDelivr 锁定 commit 拉取。
@@ -67,13 +93,25 @@ GrabCAD 有 V-22，但都是 CAD 实体模型——没贴图、面数爆炸，�
 
 顶部的徽章是汇总：全绿 = 能直接用，有黄 = 可用但要调，有红 = 有硬伤。
 
-## 冒烟测试
+## 测试
+
+全部用无头 Chrome 真的加载模型、驱动 UI、量几何数据，不是单元测试的替身。
+（需要系统里有 `/usr/bin/google-chrome`。端口漂移时加 `URL=http://localhost:5174/`。）
 
 ```bash
 npm run dev
-npm run smoke              # 端口是 5173 时
-URL=http://localhost:5174/ npm run smoke   # 端口漂移时
+npm run smoke        # 加载两个模型、出报告、截图，检查控制台报错
+npm run test:tilt    # 短舱倾转在几何上是否正确
+npm run test:rigid   # 短舱是否整体刚性转动、机身是否纹丝不动
 ```
 
-用无头 Chrome 真的加载两个模型、读出报告、截图到 `smoke-shot.png`，并检查控制台报错。
-（需要系统里有 `/usr/bin/google-chrome`。)
+`test:tilt` 的判据全部是量出来的，不靠肉眼：
+
+- 旋翼必须**跟着**短舱走（层级挂错的话它会原地不动）
+- 0° 时旋翼轴垂直（桨盘水平）= 直升机模式
+- 90° 时旋翼轴顺着机身（桨盘竖直）= 飞机模式
+- 短舱必须朝**机头**倒，不能朝机尾（机身轴向由前起落架和尾部货舱门的位置现推，不写死）
+
+`test:rigid` 量的是包围盒中心之间的距离：短舱内部任意两个部件的间距在任何角度下
+都必须不变，机翼/机身/尾翼则必须完全不动。这条抓的是坐标系错位——
+曾经枢轴和网格差了 90°，短舱会绕机身滚转轴翻，左右分家，但只测枢轴节点是测不出来的。

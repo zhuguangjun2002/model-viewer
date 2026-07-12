@@ -4,6 +4,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { loadFromURL, loadFromFiles } from './loaders.js';
 import { inspect } from './inspect.js';
 import { renderReport } from './report.js';
+import { findPivots, renderParts, updateSpin } from './parts.js';
 
 // 环境贴图（IBL）是 PBR 材质看起来"有质感"的一半原因：金属面反射的其实是周围环境。
 // RoomEnvironment 是 three 内置的程序化房间，不用下载任何 HDR 文件就能有像样的反射。
@@ -23,6 +24,7 @@ export class Pane {
     this.app = app;
     this.model = null;
     this.mixer = null;
+    this.pivots = [];
     this.clock = new THREE.Clock();
 
     const host = el.querySelector('.canvas-host');
@@ -157,6 +159,16 @@ export class Pane {
         loadMs,
         stats: this.stats,
       });
+
+      // 转换器把 FlightGear 的旋转轴写进了节点 extras，这里扫出来做成滑杆
+      this.pivots = findPivots(this.model);
+      if (this.pivots.length) {
+        const panel = document.createElement('div');
+        panel.className = 'parts-panel';
+        this.reportEl.prepend(panel);
+        renderParts(panel, this.pivots);
+      }
+
       this.app.onPaneLoaded();
     } catch (err) {
       console.error(err);
@@ -180,6 +192,7 @@ export class Pane {
     this.model = null;
     this.mixer = null;
     this.stats = null;
+    this.pivots = [];
     this.el.classList.remove('has-model');
     this.reportEl.innerHTML = '';
   }
@@ -264,6 +277,7 @@ export class Pane {
     this.controls.autoRotateSpeed = 1.2;
     const dt = this.clock.getDelta();
     this.mixer?.update(dt);
+    updateSpin(this.pivots, dt);
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }

@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "smoke": "node scripts/smoke.mjs",
-    "postinstall": "node scripts/copy-decoders.mjs"
+    "postinstall": "node scripts/copy-decoders.mjs",
+    "test:tilt": "node scripts/tilt-test.mjs",
+    "test:rigid": "node scripts/rigid.mjs",
+    "convert": "echo \"见 README：用 Blender 无头模式跑 tools/ac3d_to_gltf.py\""
   },
   "dependencies": {
     "three": "^0.180.0"

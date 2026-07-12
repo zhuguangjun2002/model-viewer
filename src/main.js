@@ -9,7 +9,14 @@ const V22 =
 
 const SAMPLES = [
   {
-    label: 'V-22 鱼鹰',
+    // 由 FlightGear 的开源 V-22 转来（tools/ac3d_to_gltf.py），
+    // 保留了短舱倾转、旋翼、起落架、舱门的枢轴——能真的动起来
+    label: 'V-22（FlightGear · 可动）',
+    url: '/models/v22-fg.glb',
+    credit: 'V-22 模型来自 FlightGear V22-Osprey 项目，GPL v2',
+  },
+  {
+    label: 'V-22（Sketchfab · 静态）',
     url: V22,
     // CC-BY 要求署名，这行不能删
     credit: 'V-22 模型 © Muhamad Mirza Arrafi，CC-BY-4.0',
@@ -137,4 +144,7 @@ class App {
   };
 }
 
-new App();
+const app = new App();
+
+// 给自动化测试用的钩子（scripts/tilt-test.mjs 要靠它量枢轴的世界姿态）
+globalThis.__app = app;
