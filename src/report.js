@@ -49,6 +49,7 @@ export function renderReport(el, { name, source, credit, loadMs, stats: s }) {
 
     <div class="sec">可动性</div>
     <table>
+      ${row('可动枢轴', s.pivots || '无')}
       ${row('骨骼网格', s.skinnedCount || '无')}
       ${row('动画', s.animations.length ? s.animations.join('、') : '无')}
     </table>

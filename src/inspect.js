@@ -17,7 +17,7 @@ const MAP_KEYS = [
 /**
  * 把一个模型拆开数一遍，得到判断"这模型好不好"所需的全部硬指标。
  */
-export function inspect(root, { bytes = 0, animations = [], drawCalls = 0 } = {}) {
+export function inspect(root, { bytes = 0, animations = [], drawCalls = 0, pivots = 0 } = {}) {
   let triangles = 0;
   let vertices = 0;
   let meshCount = 0;
@@ -98,6 +98,7 @@ export function inspect(root, { bytes = 0, animations = [], drawCalls = 0 } = {}
     geometryVRAM,
     drawCalls,
     skinnedCount,
+    pivots,
     animations: animations.map((a) => a.name || '(未命名)'),
     usedMaps,
     missingUV,
@@ -178,14 +179,18 @@ function judge(s) {
     say('warn', `${s.missingNormal} 个网格缺法线，光照会不正常`);
   }
 
-  // 骨骼与动画——对 V-22 来说这条最关键：没骨骼就转不了发动机短舱
+  // 可动性——对 V-22 来说这条最关键：驱动不了部件就做不了变形。
+  // 三条路：带枢轴节点（最好，转换器从 FlightGear 的动画定义还原出来的）、
+  // 带骨骼绑定、或者只能靠网格层级手动转。一整块网格则彻底没救。
   if (s.animations.length > 0) {
     say('good', `自带 ${s.animations.length} 段动画：${s.animations.join('、')}`);
   }
-  if (s.skinnedCount > 0) {
+  if (s.pivots > 0) {
+    say('good', `带 ${s.pivots} 个可动枢轴，旋转轴已随模型导出——部件可以直接驱动`);
+  } else if (s.skinnedCount > 0) {
     say('good', '带骨骼绑定，可以驱动关节做动画（比如 V-22 的发动机短舱旋转）');
   } else if (s.meshCount > 1) {
-    say('warn', '没有骨骼，但模型分了多个网格——仍可以按网格层级手动旋转部件');
+    say('warn', '没有骨骼也没有枢轴，但模型分了多个网格——仍可以按网格层级手动旋转部件');
   } else if (s.meshCount === 1) {
     say('bad', '整个模型是一整块网格，没有骨骼也没有部件划分，任何部位都动不了');
   }

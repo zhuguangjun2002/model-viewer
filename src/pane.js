@@ -147,10 +147,14 @@ export class Pane {
       this.renderer.render(this.scene, this.camera);
       const drawCalls = this.renderer.info.render.calls;
 
+      // 枢轴要先扫出来，报告卡才能把「可动性」算进评级
+      this.pivots = findPivots(this.model);
+
       this.stats = inspect(this.model, {
         bytes,
         animations: result.animations ?? [],
         drawCalls,
+        pivots: this.pivots.length,
       });
       renderReport(this.reportEl, {
         name: result.name ?? fallbackName ?? '模型',
@@ -160,8 +164,7 @@ export class Pane {
         stats: this.stats,
       });
 
-      // 转换器把 FlightGear 的旋转轴写进了节点 extras，这里扫出来做成滑杆
-      this.pivots = findPivots(this.model);
+      // 转换器把 FlightGear 的旋转轴写进了节点 extras，这里做成滑杆
       if (this.pivots.length) {
         const panel = document.createElement('div');
         panel.className = 'parts-panel';
