@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3D 模型对比查看器</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>模型对比</h1>
+      <div class="toolbar">
+        <label class="check"><input type="checkbox" id="sync" checked /> 同步视角</label>
+        <label class="check"><input type="checkbox" id="wire" /> 线框</label>
+        <label class="check"><input type="checkbox" id="rotate" /> 自动旋转</label>
+        <label class="check"><input type="checkbox" id="env" checked /> 环境光照</label>
+        <button id="add-pane">+ 加一栏</button>
+      </div>
+    </header>
+
+    <main id="panes"></main>
+
+    <div id="drop-hint">松手即可加载</div>
+
+    <template id="pane-tpl">
+      <section class="pane">
+        <div class="stage">
+          <div class="stage-head">
+            <input class="url" type="text" placeholder="粘贴 .glb 链接，回车加载" spellcheck="false" />
+            <button class="pick">选文件</button>
+            <button class="close" title="移除此栏">×</button>
+          </div>
+          <div class="canvas-host"></div>
+          <div class="empty">
+            <p>把 <b>.glb / .gltf / .fbx / .obj / .stl</b> 拖进来</p>
+            <p class="dim">或点上面的「选文件」，或用下面的示例</p>
+          </div>
+          <div class="loading" hidden><span class="spin"></span><span class="pct">0%</span></div>
+        </div>
+        <div class="report"></div>
+      </section>
+    </template>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
