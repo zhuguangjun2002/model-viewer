@@ -26,8 +26,12 @@ const snap = (deg) => p.evaluate(async (d) => {
     return [cx/8, cy/8, cz/8];
   };
   const out = {};
-  for (const n of ['moteurG','paleG1','propdiscG','bolG','aile','fuselage','derive'])
-    { const o = pane.model.getObjectByName(n); if (o?.geometry) out[n] = centre(o); }
+  for (const n of ['moteurG','paleG1','propdiscG','bolG','aile','fuselage','derive']) {
+    let o = pane.model.getObjectByName(n);
+    // 多 primitive 的 glTF mesh 会被 three 拆成 Group（几何在子网格上），取第一个子网格代表它
+    if (o && !o.geometry) o = o.getObjectByProperty('isMesh', true);
+    if (o?.geometry) out[n] = centre(o);
+  }
   return out;
 }, deg);
 
@@ -47,6 +51,9 @@ for (let i=0;i<nac.length;i++) for (let j=i+1;j<nac.length;j++) {
   if (Math.abs(d0-d9) > 0.01) { bad++; console.log(`  ❌ ${nac[i]}–${nac[j]}: ${r(d0)} → ${r(d9)} m`); }
 }
 console.log(bad ? `  ${bad} 对间距变了 —— 短舱散架了` : '  ✅ 间距全部不变 —— 短舱整体刚性转动');
-const still = ['aile','fuselage','derive'].filter(k => dist(a[k],c[k]) > 0.01);
+const body = ['aile','fuselage','derive'];
+const missing = body.filter(k => !a[k]);
+if (missing.length) console.log(`  ❌ 没找到网格，无从判断: ${missing}`);
+const still = body.filter(k => a[k] && dist(a[k],c[k]) > 0.01);
 console.log(still.length ? `  ❌ 机身部件不该动，但动了: ${still}` : '  ✅ 机翼/机身/尾翼纹丝不动');
 await b.close();

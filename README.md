@@ -178,7 +178,7 @@ src/
 tools/
   ac3d_to_gltf.py   FlightGear .ac + .xml → glTF（在 Blender 里跑）
 scripts/
-  smoke.mjs / tilt-test.mjs / rigid.mjs / anim-test.mjs   无头 Chrome 测试
+  smoke.mjs / tilt-test.mjs / rigid.mjs / anim-test.mjs / close-test.mjs   无头 Chrome 测试
 ```
 
 ## 测试
@@ -192,6 +192,7 @@ npm run smoke        # 加载两个模型、出报告、截图，检查控制台
 npm run test:tilt    # 短舱倾转在几何上是否正确
 npm run test:rigid   # 短舱是否整体刚性转动、机身是否纹丝不动
 npm run test:anims   # F-35 的 3 段动画能否各自单独驱动不同的节点
+npm run test:close   # 关掉一栏必须真正释放：Pane 可被 GC、下载被中止
 ```
 
 `test:anims` 的判据：全部暂停取基准姿态，逐段单独播放后快照所有节点的
@@ -208,3 +209,14 @@ npm run test:anims   # F-35 的 3 段动画能否各自单独驱动不同的节�
 `test:rigid` 量的是包围盒中心之间的距离：短舱内部任意两个部件的间距在任何角度下
 都必须不变，机翼/机身/尾翼则必须完全不动。这条抓的是坐标系错位——
 曾经枢轴和网格差了 90°，短舱会绕机身滚转轴翻，左右分家，但只测枢轴节点是测不出来的。
+
+`test:close` 的判据是 WeakRef + 强制 GC，不看 UI。它防的是两个真出过的泄漏
+（用堆快照的保留链定位到的）：
+
+- **关栏顺序**：`removePane` 必须先 `dispose()` 再摘 DOM。OrbitControls 用
+  `domElement.getRootNode()` 找 document 来移除它挂在 document 上的 keydown
+  监听；el 先离开文档的话监听摘不掉，整个 Pane（renderer、scene、DOM）会被
+  document → 监听 → controls → pane 这条链永远钉住，关一栏漏一栏。
+- **中途关栏**：加载必须作废（fetch 用 AbortController 真中止，其余格式靠
+  gen 号丢弃迟到的结果），否则下载和解析在后台跑完，把完整模型塞进死栏——
+  大模型解析还会阻塞主线程几秒，这就是"叉掉模型后假死"的来源。

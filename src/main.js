@@ -117,8 +117,12 @@ class App {
   removePane(pane) {
     if (this.panes.length <= 1) return;
     this.panes = this.panes.filter((p) => p !== pane);
-    pane.el.remove();
+    // 必须先 dispose 再摘 DOM：OrbitControls 用 domElement.getRootNode() 找 document
+    // 来移除它挂在 document 上的 keydown 监听。el 先离开文档的话，getRootNode()
+    // 返回的就是脱离的子树，监听摘不掉，整个 Pane 会被
+    // document → 监听 → controls → pane 这条链永远钉在内存里（堆快照实测）。
     pane.dispose();
+    pane.el.remove();
     for (const p of this.panes) p.resize();
   }
 

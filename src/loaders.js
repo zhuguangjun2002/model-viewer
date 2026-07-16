@@ -28,14 +28,15 @@ function makeGLTFLoader(manager, renderer) {
  * 从 URL 加载模型。
  * @returns {Promise<{scene: THREE.Object3D, animations: THREE.AnimationClip[]}>}
  */
-export async function loadFromURL(url, renderer, onProgress) {
+export async function loadFromURL(url, renderer, onProgress, signal) {
   const manager = new THREE.LoadingManager();
   const ext = extOf(url);
 
-  // .glb 是单文件，自己 fetch 更好：能拿到准确的字节数和真实进度。
+  // .glb 是单文件，自己 fetch 更好：能拿到准确的字节数和真实进度，
+  // 还能用 signal 中止——关栏时下载立刻停，不浪费带宽也不阻塞后续解析。
   // （跨域资源的 Performance API 读不到大小，除非服务器给了 Timing-Allow-Origin。）
   if (ext === 'glb') {
-    const { buffer, bytes } = await fetchWithProgress(url, onProgress);
+    const { buffer, bytes } = await fetchWithProgress(url, onProgress, signal);
     const gltf = await makeGLTFLoader(manager, renderer).parseAsync(buffer, '');
     return { scene: gltf.scene, animations: gltf.animations ?? [], bytes };
   }
@@ -43,8 +44,8 @@ export async function loadFromURL(url, renderer, onProgress) {
   return loadWith(manager, url, ext, renderer, onProgress);
 }
 
-async function fetchWithProgress(url, onProgress) {
-  const res = await fetch(url);
+async function fetchWithProgress(url, onProgress, signal) {
+  const res = await fetch(url, { signal });
   if (!res.ok) throw new Error(`HTTP ${res.status} —— 链接取不到文件`);
 
   const total = Number(res.headers.get('content-length')) || 0;

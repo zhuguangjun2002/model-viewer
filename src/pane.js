@@ -28,6 +28,8 @@ export class Pane {
     this.pivots = [];
     this.animItems = [];
     this.clock = new THREE.Clock();
+    this.loadGen = 0; // 每次发起加载 +1，迟到的结果对不上号就丢弃
+    this.disposed = false;
 
     const host = el.querySelector('.canvas-host');
     this.host = host;
@@ -101,7 +103,7 @@ export class Pane {
   async loadURL(url, credit) {
     this.el.querySelector('.url').value = url;
     await this.#load(
-      (onProgress) => loadFromURL(url, this.renderer, onProgress),
+      (onProgress, signal) => loadFromURL(url, this.renderer, onProgress, signal),
       url.split('/').pop().split('?')[0],
       url,
       credit,
@@ -118,6 +120,11 @@ export class Pane {
 
   async #load(run, fallbackName, source, credit) {
     this.#clearModel();
+    // 关栏或换模型时上一次加载必须作废：.glb 的 fetch 用 signal 真中止，
+    // 其余格式中止不了下载，就靠 gen 号在结果回来时整个丢弃。
+    this.loadAbort?.abort();
+    const ac = (this.loadAbort = new AbortController());
+    const gen = ++this.loadGen;
     this.loadingEl.hidden = false;
     this.pctEl.textContent = '0%';
 
@@ -125,7 +132,12 @@ export class Pane {
       const t0 = performance.now();
       const result = await run((p) => {
         this.pctEl.textContent = `${Math.round(p * 100)}%`;
-      });
+      }, ac.signal);
+      if (this.disposed || gen !== this.loadGen) {
+        // 结果迟到了：栏已关闭，或已改载别的模型。释放掉，别塞进死栏。
+        disposeTree(result.scene);
+        return;
+      }
       const loadMs = performance.now() - t0;
 
       // 从 URL 加载时进度回调拿不到文件大小（服务器不一定给 content-length），
@@ -184,6 +196,8 @@ export class Pane {
 
       this.app.onPaneLoaded();
     } catch (err) {
+      // 主动中止（关栏/换模型）抛的错不是失败，不用展示
+      if (this.disposed || gen !== this.loadGen) return;
       console.error(err);
       this.reportEl.innerHTML = `<h2>加载失败</h2><p class="sub">${escape(err.message)}</p>`;
     } finally {
@@ -194,14 +208,7 @@ export class Pane {
   #clearModel() {
     if (!this.model) return;
     this.scene.remove(this.model);
-    this.model.traverse((o) => {
-      o.geometry?.dispose();
-      for (const m of [o.material].flat()) {
-        if (!m) continue;
-        for (const v of Object.values(m)) if (v?.isTexture) v.dispose();
-        m.dispose();
-      }
-    });
+    disposeTree(this.model);
     this.model = null;
     this.mixer = null;
     this.stats = null;
@@ -298,11 +305,25 @@ export class Pane {
   }
 
   dispose() {
+    this.disposed = true;
+    this.loadAbort?.abort(); // 正在下载就中止，别让它在后台跑完再塞进死栏
     this.#clearModel();
     this.controls.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
   }
+}
+
+/** 释放一棵子树的几何/材质/贴图。加载结果被丢弃时它还没进场景，也要走这里。 */
+function disposeTree(root) {
+  root?.traverse((o) => {
+    o.geometry?.dispose();
+    for (const m of [o.material].flat()) {
+      if (!m) continue;
+      for (const v of Object.values(m)) if (v?.isTexture) v.dispose();
+      m.dispose();
+    }
+  });
 }
 
 function guessBytes(source) {
