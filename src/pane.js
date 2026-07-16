@@ -5,6 +5,7 @@ import { loadFromURL, loadFromFiles } from './loaders.js';
 import { inspect } from './inspect.js';
 import { renderReport } from './report.js';
 import { findPivots, renderParts, updateSpin } from './parts.js';
+import { renderAnims, updateAnims } from './anims.js';
 
 // 环境贴图（IBL）是 PBR 材质看起来"有质感"的一半原因：金属面反射的其实是周围环境。
 // RoomEnvironment 是 three 内置的程序化房间，不用下载任何 HDR 文件就能有像样的反射。
@@ -25,6 +26,7 @@ export class Pane {
     this.model = null;
     this.mixer = null;
     this.pivots = [];
+    this.animItems = [];
     this.clock = new THREE.Clock();
 
     const host = el.querySelector('.canvas-host');
@@ -136,7 +138,6 @@ export class Pane {
 
       if (result.animations?.length) {
         this.mixer = new THREE.AnimationMixer(this.model);
-        this.mixer.clipAction(result.animations[0]).play();
       }
 
       this.applyWireframe(this.app.wireframe);
@@ -172,6 +173,15 @@ export class Pane {
         renderParts(panel, this.pivots);
       }
 
+      // 模型自带的动画片段：每段一行，可单独播放/拖时间轴看
+      if (result.animations?.length) {
+        const panel = document.createElement('div');
+        panel.className = 'parts-panel anims';
+        this.reportEl.prepend(panel);
+        this.animItems = renderAnims(panel, this.mixer, result.animations);
+        this.animItems[0].play(); // 保持原先"加载即播第一段"的行为
+      }
+
       this.app.onPaneLoaded();
     } catch (err) {
       console.error(err);
@@ -196,6 +206,7 @@ export class Pane {
     this.mixer = null;
     this.stats = null;
     this.pivots = [];
+    this.animItems = [];
     this.el.classList.remove('has-model');
     this.reportEl.innerHTML = '';
   }
@@ -280,6 +291,7 @@ export class Pane {
     this.controls.autoRotateSpeed = 1.2;
     const dt = this.clock.getDelta();
     this.mixer?.update(dt);
+    updateAnims(this.animItems);
     updateSpin(this.pivots, dt);
     this.controls.update();
     this.renderer.render(this.scene, this.camera);

@@ -10,6 +10,7 @@
     "smoke": "node scripts/smoke.mjs",
     "postinstall": "node scripts/copy-decoders.mjs",
     "test:tilt": "node scripts/tilt-test.mjs",
+    "test:anims": "node scripts/anim-test.mjs",
     "test:rigid": "node scripts/rigid.mjs",
     "convert": "echo \"见 README：用 Blender 无头模式跑 tools/ac3d_to_gltf.py\""
   },

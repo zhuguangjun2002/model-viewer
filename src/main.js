@@ -22,6 +22,13 @@ const SAMPLES = [
     credit: 'V-22 模型 © Muhamad Mirza Arrafi，CC-BY-4.0',
   },
   {
+    // 带 3 段独立动画（喷口 + 两段起落架），正好演示动画面板的分段控制
+    label: 'F-35（3 段动画）',
+    url: '/models/f35.glb',
+    // CC-BY 要求署名，这行不能删
+    credit: 'F-35 模型 © SIpriv（Sketchfab），CC-BY-4.0',
+  },
+  {
     label: '小飞机（Cesium Air）',
     url: 'https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/models/CesiumAir/Cesium_Air.glb',
   },

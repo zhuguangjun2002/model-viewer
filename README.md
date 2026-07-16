@@ -127,6 +127,17 @@ FlightGear 版 V-22 有 10 个：短舱倾转、机翼折叠、左右旋翼（�
 三组起落架、三道舱门。部件名是法语的（原作者是法国人），
 `src/parts.js` 里只做显示翻译和角度范围。
 
+## 动画面板
+
+模型自带 AnimationClip 时，报告卡上方会生成动画面板：**每段动画一行**，
+勾「播」循环播放，取消勾选定格在当前姿态，此时拖时间轴可以逐帧看。
+多段可以同时播，也可以只开一段——之前只会自动播第一段，
+像 F-35 示例这种带 3 段动画（喷口 + 两段起落架）的模型，后两段根本没入口。
+加载后默认仍自动播第一段，行为不回退。
+
+F-35 示例（`public/models/f35.glb`）来自 Sketchfab，
+**作者 SIpriv，CC-BY-4.0，署名在报告卡里，别删**。
+
 ## 现状与下一步
 
 **已经能用的**：并排对比 + 体检报告；FlightGear 版 V-22 的 10 个可动部件
@@ -163,10 +174,11 @@ src/
   inspect.js   模型体检：面数、显存、贴图通道、可动性 → 硬指标 + 结论
   report.js    报告卡渲染
   parts.js     枢轴扫描与滑杆（读 userData.fgAxis）
+  anims.js     动画面板：每段 AnimationClip 单独播放/暂停/拖时间轴
 tools/
   ac3d_to_gltf.py   FlightGear .ac + .xml → glTF（在 Blender 里跑）
 scripts/
-  smoke.mjs / tilt-test.mjs / rigid.mjs   无头 Chrome 测试
+  smoke.mjs / tilt-test.mjs / rigid.mjs / anim-test.mjs   无头 Chrome 测试
 ```
 
 ## 测试
@@ -179,7 +191,12 @@ npm run dev
 npm run smoke        # 加载两个模型、出报告、截图，检查控制台报错
 npm run test:tilt    # 短舱倾转在几何上是否正确
 npm run test:rigid   # 短舱是否整体刚性转动、机身是否纹丝不动
+npm run test:anims   # F-35 的 3 段动画能否各自单独驱动不同的节点
 ```
+
+`test:anims` 的判据：全部暂停取基准姿态，逐段单独播放后快照所有节点的
+四元数和位置——每段都必须有节点动了，且三段动的节点集合互不相同
+（实测 3 / 9 / 16 个节点）。
 
 `test:tilt` 的判据全部是量出来的，不靠肉眼：
 
