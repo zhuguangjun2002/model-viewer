@@ -4,6 +4,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { loadFromURL, loadFromFiles } from './loaders.js';
 import { inspect } from './inspect.js';
 import { renderReport } from './report.js';
+import { renderTree, pickAt } from './tree.js';
 import { findPivots, renderParts, updateSpin } from './parts.js';
 import { renderAnims, updateAnims } from './anims.js';
 
@@ -65,8 +66,38 @@ export class Pane {
     this.grid.material.opacity = 0.5;
     this.scene.add(this.grid);
 
+    /* 点画面拾取零件名。用 pointerdown/up 的位移判「是点击还是拖动」——
+     * 直接监听 click 会被 OrbitControls 的转动一起触发，转一下就弹一次名字。 */
+    let downAt = null;
+    this.renderer.domElement.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; });
+    this.renderer.domElement.addEventListener('pointerup', (e) => {
+      if (!downAt || !this.model) return;
+      const moved = Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]);
+      downAt = null;
+      if (moved > 4) return;                       // 拖过就是在转视角，不算拾取
+      const hit = pickAt(e, this.renderer, this.camera, this.model);
+      if (!hit) { this.#showPick(null); return; }
+      this.tree?.select(hit.name);                 // 树里同步选中并高亮
+      this.#showPick(hit.name, null, hit.material?.name);
+    });
+
     this.#wireUI();
     this.resize();
+  }
+
+  /** 左下角那行拾取结果。name 传 null 就清空。 */
+  #showPick(name, tris, matName) {
+    let el = this.el.querySelector('.pick-line');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'pick-line';
+      this.host.appendChild(el);
+    }
+    if (!name) { el.textContent = ''; return; }
+    const bits = [`<b>${name}</b>`];
+    if (tris != null) bits.push(`${tris.toLocaleString()} tris`);
+    if (matName) bits.push(`材质 ${matName}`);
+    el.innerHTML = bits.join('　');
   }
 
   #wireUI() {
@@ -177,6 +208,14 @@ export class Pane {
         stats: this.stats,
       });
 
+      /* 场景树：所有具名零件一行一个（带三角形数和显隐勾选）。
+       * 枢轴滑杆只覆盖 FlightGear 那套带 fgAxis 的节点，Sketchfab 来的模型一个都没有——
+       * 那类模型「有没有可控的零件」以前在这个界面上完全看不出来。 */
+      const treePanel = document.createElement('div');
+      treePanel.className = 'parts-panel tree';
+      this.reportEl.prepend(treePanel);
+      this.tree = renderTree(treePanel, this.model, (n) => this.#showPick(n.name, n.tris));
+
       // 转换器把 FlightGear 的旋转轴写进了节点 extras，这里做成滑杆
       if (this.pivots.length) {
         const panel = document.createElement('div');
@@ -207,6 +246,8 @@ export class Pane {
 
   #clearModel() {
     if (!this.model) return;
+    this.tree?.dispose();
+    this.tree = null;
     this.scene.remove(this.model);
     disposeTree(this.model);
     this.model = null;

@@ -157,5 +157,18 @@ class App {
 
 const app = new App();
 
+/* 用 URL 直接开模型：`#model=/models/c17-slim-paint.glb`，
+ * 多栏用逗号分开：`#model=/models/a.glb,/models/b.glb`。
+ * 加这条纯粹是为了少点几下——审片时要反复开同一份 glb（改一版看一版），
+ * 每次都拖文件/贴地址太磨人；改完 hash 按 F5 就是新的一版。 */
+{
+  const m = /(?:^|[#&])model=([^&]+)/.exec(location.hash);
+  if (m) {
+    const urls = decodeURIComponent(m[1]).split(',').map((u) => u.trim()).filter(Boolean);
+    while (app.panes.length < Math.min(urls.length, 4)) app.addPane();
+    urls.slice(0, 4).forEach((u, i) => app.panes[i]?.loadURL(u));
+  }
+}
+
 // 给自动化测试用的钩子（scripts/tilt-test.mjs 要靠它量枢轴的世界姿态）
 globalThis.__app = app;

@@ -258,3 +258,30 @@ body.dragging #drop-hint { display: flex; }
   pointer-events: auto;
 }
 .samples button { font-size: 12px; padding: 4px 9px; }
+
+/* ── 场景树 + 拾取（src/tree.js）───────────────────────────── */
+.parts-panel.tree .tree-list {
+  max-height: 220px; overflow-y: auto;      /* 351 个零件的模型不能把报告卡挤没 */
+  border-top: 1px solid var(--line, #2a2f38);
+}
+.tree-head { gap: 6px; }
+.tree-head .tree-filter {
+  flex: 1; min-width: 60px; background: #171b22; color: #cfd8e3;
+  border: 1px solid #2a2f38; border-radius: 4px; padding: 2px 6px; font: inherit;
+}
+.tree-head .tree-hint { color: #6d7885; font-size: 11px; }
+.tree-row { cursor: default; }
+.tree-row label { cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-row label:hover { color: #6fd4ff; }
+.tree-row.sel { background: rgba(43, 107, 255, .18); }
+.tree-tris { color: #7c8794; font-variant-numeric: tabular-nums; font-size: 11px; }
+.pick-line {
+  position: absolute; left: 8px; bottom: 8px; z-index: 3; pointer-events: none;
+  color: #d7e3ee; background: rgba(8, 12, 18, .78); border-radius: 6px;
+  padding: 4px 9px; font: 12px/1.5 ui-monospace, Consolas, monospace; max-width: calc(100% - 16px);
+}
+.pick-line b { color: #6fd4ff; }
+/* 树的行不跟枢轴滑杆共用列宽：名字要给足，右边挤三角形数和显隐勾 */
+.parts-panel.tree .part { grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; }
+.parts-panel.tree .tree-head { grid-template-columns: auto 1fr auto; }
+.parts-panel.tree .tree-head .tree-hint { white-space: nowrap; }

@@ -3,3 +3,7 @@ dist
 public/decoders
 smoke-shot.png
 tilt-*.png
+tree-shot.png
+# 另一个项目生成的 C-17 诊断件（4MB，随时可重新生成）。
+# 拖进来看的模型一律不入库——这个查看器的用法就是"临时丢一份进来看"，仓库不该跟着长。
+public/models/c17-*.glb
