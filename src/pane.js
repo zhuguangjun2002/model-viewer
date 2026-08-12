@@ -10,14 +10,21 @@ import { renderAnims, updateAnims } from './anims.js';
 
 // 环境贴图（IBL）是 PBR 材质看起来"有质感"的一半原因：金属面反射的其实是周围环境。
 // RoomEnvironment 是 three 内置的程序化房间，不用下载任何 HDR 文件就能有像样的反射。
-let envMap = null;
+//
+// ⚠ **每个 renderer 各生成一份，不能全局共用一份**。每栏都是自己的 WebGLRenderer、
+//   自己的 WebGL 上下文；PMREM 出来的是**渲染目标纹理**，绑死在生成它的那个上下文里。
+//   把第一栏的贴图塞给第二栏，第二栏拿不到有效的环境光 —— PBR 材质丢掉 IBL，
+//   整个模型就发灰发暗（第一栏白亮、第二栏灰暗，症状就是这么来的）。
+const envMaps = new WeakMap();      // renderer → envMap
 function getEnvMap(renderer) {
-  if (!envMap) {
+  let map = envMaps.get(renderer);
+  if (!map) {
     const pmrem = new THREE.PMREMGenerator(renderer);
-    envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    map = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     pmrem.dispose();
+    envMaps.set(renderer, map);
   }
-  return envMap;
+  return map;
 }
 
 export class Pane {
@@ -349,6 +356,10 @@ export class Pane {
     this.disposed = true;
     this.loadAbort?.abort(); // 正在下载就中止，别让它在后台跑完再塞进死栏
     this.#clearModel();
+    // 这栏的环境贴图是它自己那个上下文里的渲染目标，跟着栏一起释放
+    this.scene.environment = null;
+    envMaps.get(this.renderer)?.dispose();
+    envMaps.delete(this.renderer);
     this.controls.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();

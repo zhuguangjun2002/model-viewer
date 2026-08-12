@@ -13,6 +13,7 @@
     "test:anims": "node scripts/anim-test.mjs",
     "test:close": "node scripts/close-test.mjs",
     "test:rigid": "node scripts/rigid.mjs",
+    "test:env": "node scripts/env-parity.mjs",
     "convert": "echo \"见 README：用 Blender 无头模式跑 tools/ac3d_to_gltf.py\""
   },
   "dependencies": {
