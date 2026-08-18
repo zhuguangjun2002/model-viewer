@@ -13,7 +13,7 @@ const SAMPLES = [
     // 保留了短舱倾转、旋翼、起落架、舱门的枢轴——能真的动起来
     label: 'V-22（FlightGear · 可动）',
     url: '/models/v22-fg.glb',
-    credit: 'V-22 模型来自 FlightGear V22-Osprey 项目，GPL v2',
+    credit: 'V-22 模型 © BARANGER Emmanuel（FlightGear V22-Osprey），GPL v2',
   },
   {
     label: 'V-22（Sketchfab · 静态）',
@@ -31,14 +31,18 @@ const SAMPLES = [
   {
     label: '小飞机（Cesium Air）',
     url: 'https://raw.githubusercontent.com/CesiumGS/cesium/main/Apps/SampleData/models/CesiumAir/Cesium_Air.glb',
+    credit: 'Cesium Air © CesiumGS，Apache-2.0',
   },
   {
     label: 'PBR 材质样板（破损头盔）',
     url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+    // ⚠ 原始模型是 CC-BY-**NC**，禁止商用。只当材质参照看，别搬进商业项目
+    credit: 'Damaged Helmet © theblueturtle_（CC-BY-NC-4.0）/ ctxwing（CC-BY-4.0）',
   },
   {
     label: '带动画（LittlestTokyo）',
     url: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/LittlestTokyo.glb',
+    credit: 'Littlest Tokyo © Glen Fox，CC-BY-4.0',
   },
 ];
 

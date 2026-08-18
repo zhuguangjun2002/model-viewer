@@ -152,8 +152,9 @@ F-35 示例（`public/models/f35.glb`）来自 Sketchfab，
 - `npm run dev` 会跑在 **5174** 而不是 5173——5173 被你另一个项目占着。
   所以测试要写成 `URL=http://localhost:5174/ npm run test:tilt`。
 - 控制台有一条 favicon 404，无害，冒烟测试会把它算进"报错 1 条"。
-- 仓库里没有 LICENSE 文件，但 `public/models/v22-fg.glb` 是 **GPL v2**
-  （源自 FlightGear）。要公开发布的话得处理这个。
+- 许可是**分层**的：代码 MIT（[LICENSE](LICENSE)），但 `public/models/v22-fg.glb`
+  是 **GPL v2**（源自 FlightGear），示例里的 Damaged Helmet 还带 **NC 禁止商用**。
+  逐条义务见 [THIRD-PARTY.md](THIRD-PARTY.md)——**往 `public/models/` 加入库文件前先在那里登记一行**。
 - 单片桨叶的变距枢轴（`PiedPale*`，6 个）被 `src/parts.js` 过滤掉了，
   嫌太细节。想要的话把那行 filter 去掉。
 
@@ -181,6 +182,8 @@ src/
   anims.js     动画面板：每段 AnimationClip 单独播放/暂停/拖时间轴
 tools/
   ac3d_to_gltf.py   FlightGear .ac + .xml → glTF（在 Blender 里跑）
+licenses/
+  GPL-2.0.txt       v22-fg.glb 要求随附的许可正文
 scripts/
   smoke.mjs / tilt-test.mjs / rigid.mjs / anim-test.mjs / close-test.mjs   无头 Chrome 测试
 ```
