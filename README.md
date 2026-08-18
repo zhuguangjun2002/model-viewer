@@ -3,6 +3,7 @@
 在网页里并排加载多个 3D 模型，同步转动，并用硬指标判断"哪个模型更好"。
 
 仓库：<https://github.com/zhuguangjun2002/model-viewer>（private）
+许可：代码 [MIT](LICENSE)；`public/models/` 下的模型是第三方作品，**各自另有许可**（其中一个是 GPL v2），见 [THIRD-PARTY.md](THIRD-PARTY.md)。
 
 ```bash
 git clone https://github.com/zhuguangjun2002/model-viewer.git
