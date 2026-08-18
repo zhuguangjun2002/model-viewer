@@ -1,20 +1,33 @@
 # 第三方素材与许可
 
 本项目**代码**是 MIT（见 [LICENSE](LICENSE)）。
-但 `public/models/` 下的模型文件是别人的作品，各自带着**不同的、更严格的**许可。
-这份清单是它们的账本——公开发布或分发本仓库前，逐条对一遍。
+模型文件是别人的作品，各自带着不同的许可。这份清单是它们的账本——
+**往 `public/models/` 加入库文件前，先在这里加一行。**
+
+**当前入库的第三方文件只有一个：`public/models/f35.glb`（CC-BY-4.0）。**
+唯一的 GPL 件 `v22-fg.glb` 已移出仓库（下一节说明），所以本仓库的分发
+不再承担任何 copyleft 义务，只剩 CC-BY 的署名义务。
 
 代码和这些模型是 **aggregation（聚合）关系，不是派生关系**：查看器在运行时加载
 它们，和加载你自己拖进来的任意一份 glb 没有区别，代码里没有任何一行是从这些
-模型派生出来的。所以 GPL v2 的传染性不及于本项目代码（GPL v2 第 2 节末段，
-"mere aggregation of another work not based on the Program"）。
-但**那个 GPL 文件本身**仍然是 GPL，下面的义务照单执行。
+模型派生出来的。
 
 ---
 
-## `public/models/v22-fg.glb` —— GPL v2 ⚠
+## `public/models/v22-fg.glb` —— GPL v2，**已移出仓库** ⚠
 
 可变形的那架 V-22，10 个可动枢轴，本项目的主力示例。
+**这个文件不在仓库里**（`.gitignore` 挡着），需要使用者自己转一份——
+就是为了让本仓库保持纯 MIT 分发，不背 GPL 的随附许可与提供源码义务。
+
+缺了它的直接后果：
+
+- 第一个示例按钮点了会 404（标题已标注「需自行转换」）
+- `npm run test:tilt` / `test:rigid` / `test:close` 跑不了
+  （`scripts/require-v22.mjs` 会拦下来并打印生成命令，不会卡成超时）
+
+下面的信息保留着，因为你**自己转出来的那份仍然是 GPL v2 衍生件**——
+自用无所谓，一旦要把它发给别人，这些义务就生效。
 
 | | |
 |---|---|
@@ -28,7 +41,7 @@
 这个 `.glb` 是上游 `Models/v22.ac` + `Models/v22.xml` 经 `tools/ac3d_to_gltf.py`
 转换得到的，**属于 GPL v2 意义上的衍生作品**，因此它自己必须继续以 GPL v2 分发。
 
-### 分发它时必须做到的三件事
+### 如果你要分发自己转出来的那份，必须做到三件事
 
 1. **随附许可正文** —— 保留 `licenses/GPL-2.0.txt`（GPL v2 第 1 节）。
 2. **保留署名与许可声明** —— 保留本文件里这一节，别删作者名。
@@ -49,8 +62,11 @@
 > 没有复制 FlightGear 的任何代码。工具不会因为处理了 GPL 数据就变成 GPL
 > （否则每个编译器都得是 GPL 的）。它是 MIT，随本项目代码走。
 
-> **想彻底摆脱这条义务**：把 `public/models/v22-fg.glb` 从 git 里删掉，
-> 让用户按 README 的命令自己转一份。代价是内置的 V-22 示例按钮开箱即失效。
+> ⚠ **git 历史里还留着它。** `git rm --cached` 只是让它从当前版本消失，
+> 2026-08-18 之前的每个 commit 里仍然有这 2.1 MB 的 glb，`git clone` 会连着历史
+> 一起拿到。仓库目前是 private，不构成对外分发，所以没有实际问题；
+> **但如果要转成 public，得先用 `git filter-repo` 把它从历史里彻底抹掉并强推**，
+> 否则等于仍在分发 GPL 件，上面三条义务照样成立。
 
 ---
 
@@ -95,15 +111,22 @@ CC-BY 允许你这么做。
 |---|---|---|
 | Cesium Air | CesiumGS | Apache-2.0（`CesiumGS/cesium` 仓库整体许可；`LICENSE.md` 未对该素材单列） |
 | Littlest Tokyo | Glen Fox | CC-BY-4.0（three.js 示例页署明 "CC Attribution"） |
-| **Damaged Helmet** | **theblueturtle_ (2016) / ctxwing (2018)** | **CC-BY-NC-4.0 + CC-BY-4.0** ⚠ |
+| BoomBox | Khronos Group | **CC0 1.0**（公有领域，商用无限制、连署名都不强制） |
 
-⚠ **Damaged Helmet 带 NC（NonCommercial）条款**——Khronos 示例库的
-`Models/DamagedHelmet/README.md` 里写得明白：2016 年的原始模型是
-theblueturtle_ 的 **CC-BY-NC-4.0**，2018 年 ctxwing 的 glTF 转换才是 CC-BY-4.0。
-NC 是叠加的，取严：**这个模型禁止商用**。
-它在本项目里只作 PBR 材质参照（"有法线/粗糙度/金属度长什么样"），
-别把它搬进任何商业项目。真需要一个能商用的 PBR 样板，从 Khronos 示例库里
-另挑一个纯 CC0 / CC-BY 的换掉。
+### PBR 样板换过一次：DamagedHelmet → BoomBox
+
+原来的「PBR 材质样板」用的是 Khronos 的 **DamagedHelmet**，它带 **NC 条款**——
+`Models/DamagedHelmet/README.md` 里写得明白：2016 年 theblueturtle_ 的原始模型是
+**CC-BY-NC-4.0**，2018 年 ctxwing 的 glTF 转换才是 CC-BY-4.0。NC 是叠加的，取严即
+**禁止商用**，作为一个默认示例太容易被人顺手拿走，所以换掉了。
+
+换成 **BoomBox**（CC0 1.0，公有领域）。它同样是 Khronos 官方示例，而且贴图通道
+更全——颜色 / 法线 / 粗糙度 / 金属度 / 自发光 / AO 六样齐活，正是「PBR 样板」
+要演示的东西。代价是文件大些（10.6 MB vs 3.8 MB，4K 贴图），热链加载慢一点。
+
+Khronos 示例库里 CC0 的还有 WaterBottle、Lantern、AntiqueCamera、SciFiHelmet、
+FlightHelmet、ToyCar、Corset 等，想换随便挑；注意 SciFiHelmet 和 FlightHelmet
+**没有 glb 变体**，只有散装 glTF。
 
 ---
 

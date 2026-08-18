@@ -10,8 +10,10 @@ const V22 =
 const SAMPLES = [
   {
     // 由 FlightGear 的开源 V-22 转来（tools/ac3d_to_gltf.py），
-    // 保留了短舱倾转、旋翼、起落架、舱门的枢轴——能真的动起来
-    label: 'V-22（FlightGear · 可动）',
+    // 保留了短舱倾转、旋翼、起落架、舱门的枢轴——能真的动起来。
+    // ⚠ 这个 glb 是 GPL v2 衍生件，故意没有入库（见 THIRD-PARTY.md），
+    //   新克隆下来点这个按钮会 404，得先按 README 自己转一份。
+    label: 'V-22（FlightGear · 可动 · 需自行转换）',
     url: '/models/v22-fg.glb',
     credit: 'V-22 模型 © BARANGER Emmanuel（FlightGear V22-Osprey），GPL v2',
   },
@@ -34,10 +36,12 @@ const SAMPLES = [
     credit: 'Cesium Air © CesiumGS，Apache-2.0',
   },
   {
-    label: 'PBR 材质样板（破损头盔）',
-    url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
-    // ⚠ 原始模型是 CC-BY-**NC**，禁止商用。只当材质参照看，别搬进商业项目
-    credit: 'Damaged Helmet © theblueturtle_（CC-BY-NC-4.0）/ ctxwing（CC-BY-4.0）',
+    // 原来这里是 DamagedHelmet，换掉了：它的原始模型是 CC-BY-**NC**，禁止商用。
+    // BoomBox 是 CC0（公有领域，商用无限制），且贴图通道更全——
+    // 颜色 / 法线 / 粗糙度 / 金属度 / 自发光 / AO 六样齐活，正是要演示的东西。
+    label: 'PBR 材质样板（BoomBox）',
+    url: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/BoomBox/glTF-Binary/BoomBox.glb',
+    credit: 'BoomBox © Khronos Group，CC0 1.0（公有领域）',
   },
   {
     label: '带动画（LittlestTokyo）',

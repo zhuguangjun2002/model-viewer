@@ -1,6 +1,9 @@
 // 量几何体包围盒中心的世界坐标 —— 不能量物体原点：
 // 这批网格的原点都在世界原点，顶点坐标直接是绝对值，原点读数毫无意义。
 import puppeteer from 'puppeteer-core';
+import { requireV22 } from './require-v22.mjs';
+
+await requireV22(process.env.URL ?? 'http://localhost:5173/');
 const b = await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:'new',args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const p = await b.newPage();
 await p.goto(process.env.URL ?? 'http://localhost:5173/', {waitUntil:'networkidle0'});

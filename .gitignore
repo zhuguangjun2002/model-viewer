@@ -4,6 +4,12 @@ public/decoders
 smoke-shot.png
 tilt-*.png
 tree-shot.png
+f35-anim.png
+# GPL v2 的衍生件（源自 FlightGear V22-Osprey）。留在仓库里会让本仓库的分发
+# 背上 GPL 的随附许可 + 提供源码义务，所以移出去，由使用者按 README 自己转一份。
+# 本地这份照常用，测试也照常跑（scripts/require-v22.mjs 会在缺失时给出提示）。
+public/models/v22-fg.glb
+
 # 另一个项目生成的 C-17 诊断件（4MB，随时可重新生成）。
 # 拖进来看的模型一律不入库——这个查看器的用法就是"临时丢一份进来看"，仓库不该跟着长。
 public/models/c17-*.glb

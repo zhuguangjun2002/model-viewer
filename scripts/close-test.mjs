@@ -10,6 +10,9 @@
 //   B) 加载完成后关闭   → Pane 必须可被回收
 //   C) 加载中途关闭     → fetch 必须被中止，且 Pane 必须可被回收
 import puppeteer from 'puppeteer-core';
+import { requireV22 } from './require-v22.mjs';
+
+await requireV22(process.env.URL ?? 'http://localhost:5173/');
 
 const browser = await puppeteer.launch({
   executablePath: '/usr/bin/google-chrome',

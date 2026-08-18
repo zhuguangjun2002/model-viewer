@@ -3,7 +3,8 @@
 在网页里并排加载多个 3D 模型，同步转动，并用硬指标判断"哪个模型更好"。
 
 仓库：<https://github.com/zhuguangjun2002/model-viewer>（private）
-许可：代码 [MIT](LICENSE)；`public/models/` 下的模型是第三方作品，**各自另有许可**（其中一个是 GPL v2），见 [THIRD-PARTY.md](THIRD-PARTY.md)。
+许可：代码 [MIT](LICENSE)。仓库里唯一的第三方模型 `f35.glb` 是 CC-BY-4.0；
+GPL v2 的那个 V-22 已移出仓库，需自行转换（见 [THIRD-PARTY.md](THIRD-PARTY.md)）。
 
 ```bash
 git clone https://github.com/zhuguangjun2002/model-viewer.git
@@ -24,6 +25,11 @@ npm run dev
 是 view-only 的，页面上没有下载入口，只能在线预览。
 
 ### 内置的 V-22 示例（可动）
+
+> ⚠ **这个 glb 不在仓库里，得自己转一份**（下面有命令）。它是 GPL v2 的衍生件，
+> 入库会让整个仓库的分发背上 copyleft 义务，所以移出去了。没有它时第一个示例
+> 按钮会 404，`test:tilt` / `test:rigid` / `test:close` 也跑不了（会打印生成命令，
+> 不会卡成超时）。缘由见 [THIRD-PARTY.md](THIRD-PARTY.md)。
 
 **第一个示例按钮是一架能变形的 V-22。** 拖「短舱倾转」滑杆，0° 是直升机模式
 （旋翼朝上），90° 是飞机模式（旋翼朝前），旋翼、桨叶、桨毂全跟着走。
@@ -153,9 +159,11 @@ F-35 示例（`public/models/f35.glb`）来自 Sketchfab，
 - `npm run dev` 会跑在 **5174** 而不是 5173——5173 被你另一个项目占着。
   所以测试要写成 `URL=http://localhost:5174/ npm run test:tilt`。
 - 控制台有一条 favicon 404，无害，冒烟测试会把它算进"报错 1 条"。
-- 许可是**分层**的：代码 MIT（[LICENSE](LICENSE)），但 `public/models/v22-fg.glb`
-  是 **GPL v2**（源自 FlightGear），示例里的 Damaged Helmet 还带 **NC 禁止商用**。
-  逐条义务见 [THIRD-PARTY.md](THIRD-PARTY.md)——**往 `public/models/` 加入库文件前先在那里登记一行**。
+- **`public/models/v22-fg.glb` 不在仓库里**，要自己按上面的命令转一份，否则
+  第一个示例按钮和三个测试都用不了。这是为了让仓库保持纯 MIT 分发。
+- git **历史**里还留着那个 glb（`git rm --cached` 不改历史）。仓库是 private 所以
+  没有实际问题，但**转 public 前得先用 `git filter-repo` 从历史里抹掉并强推**。
+- 许可账本在 [THIRD-PARTY.md](THIRD-PARTY.md)——**往 `public/models/` 加入库文件前先在那里登记一行**。
 - 单片桨叶的变距枢轴（`PiedPale*`，6 个）被 `src/parts.js` 过滤掉了，
   嫌太细节。想要的话把那行 filter 去掉。
 
@@ -187,6 +195,7 @@ licenses/
   GPL-2.0.txt       v22-fg.glb 要求随附的许可正文
 scripts/
   smoke.mjs / tilt-test.mjs / rigid.mjs / anim-test.mjs / close-test.mjs   无头 Chrome 测试
+  require-v22.mjs   缺 v22-fg.glb 时拦下依赖它的测试，打印生成命令
 ```
 
 ## 测试

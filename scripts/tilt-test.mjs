@@ -6,6 +6,9 @@
 // 另外旋翼桨毂必须跟着短舱一起动；如果层级挂错（旋翼是短舱的兄弟节点），
 // 它会纹丝不动 —— 这个测试就是抓这个的。
 import puppeteer from 'puppeteer-core';
+import { requireV22 } from './require-v22.mjs';
+
+await requireV22(process.env.URL ?? 'http://localhost:5173/');
 
 const browser = await puppeteer.launch({
   executablePath: '/usr/bin/google-chrome',
