@@ -2,7 +2,7 @@
 
 在网页里并排加载多个 3D 模型，同步转动，并用硬指标判断"哪个模型更好"。
 
-仓库：<https://github.com/zhuguangjun2002/model-viewer>（private）
+仓库：<https://github.com/zhuguangjun2002/model-viewer>（public）
 许可：代码 [MIT](LICENSE)。仓库里唯一的第三方模型 `f35.glb` 是 CC-BY-4.0；
 GPL v2 的那个 V-22 已移出仓库，需自行转换（见 [THIRD-PARTY.md](THIRD-PARTY.md)）。
 
@@ -156,14 +156,19 @@ F-35 示例（`public/models/f35.glb`）来自 Sketchfab，
 
 **已知的坑**（不影响使用，但你回来时会撞上）：
 
-- `npm run dev` 会跑在 **5174** 而不是 5173——5173 被你另一个项目占着。
-  所以测试要写成 `URL=http://localhost:5174/ npm run test:tilt`。
+- 端口会漂移：5173 被占用时 Vite 自动退到 **5174**。测试脚本默认连 5173，
+  漂了就用环境变量覆盖，例如 `URL=http://localhost:5174/ npm run test:tilt`。
 - 控制台有一条 favicon 404，无害，冒烟测试会把它算进"报错 1 条"。
 - **`public/models/v22-fg.glb` 不在仓库里**，要自己按上面的命令转一份，否则
   第一个示例按钮和三个测试都用不了。这是为了让仓库保持纯 MIT 分发。
-- git **历史**里还留着那个 glb（`git rm --cached` 不改历史）。仓库是 private 所以
-  没有实际问题，但**转 public 前得先用 `git filter-repo` 从历史里抹掉并强推**。
+- 历史已在 2026-08-18 用 `git filter-repo` 重写过一次，那个 glb 从全部 commit
+  里抹掉了，仓库随后转为 public。**旧的 commit SHA 全部失效**，别再引用。
 - 许可账本在 [THIRD-PARTY.md](THIRD-PARTY.md)——**往 `public/models/` 加入库文件前先在那里登记一行**。
+- ⚠ 以后再要从历史里清东西：**`git filter-repo` + `git push --force` 只清本地，
+  GitHub 端不做垃圾回收**——悬空对象仍留在它的对象库里，只要仓库是 public
+  就能按旧 SHA 直取（实测能完整下回那 2.1 MB）。必须删仓重建，或找 Support 跑 GC。
+  另外查证时别只看状态码：仓库都转 private 了，`raw.githubusercontent` 还供了
+  几分钟缓存副本（响应头 `x-cache: HIT`），只看一次返回值会误判。
 - 单片桨叶的变距枢轴（`PiedPale*`，6 个）被 `src/parts.js` 过滤掉了，
   嫌太细节。想要的话把那行 filter 去掉。
 

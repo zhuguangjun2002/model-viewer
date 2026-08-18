@@ -62,11 +62,15 @@
 > 没有复制 FlightGear 的任何代码。工具不会因为处理了 GPL 数据就变成 GPL
 > （否则每个编译器都得是 GPL 的）。它是 MIT，随本项目代码走。
 
-> ⚠ **git 历史里还留着它。** `git rm --cached` 只是让它从当前版本消失，
-> 2026-08-18 之前的每个 commit 里仍然有这 2.1 MB 的 glb，`git clone` 会连着历史
-> 一起拿到。仓库目前是 private，不构成对外分发，所以没有实际问题；
-> **但如果要转成 public，得先用 `git filter-repo` 把它从历史里彻底抹掉并强推**，
-> 否则等于仍在分发 GPL 件，上面三条义务照样成立。
+> **历史也已经清干净了**（2026-08-18）。`git rm --cached` 只改当前版本，之前每个
+> commit 里都还有这 2.1 MB 的 glb，所以又用 `git filter-repo --invert-paths` 把它从
+> 全部 commit 里抹掉，仓库随后转为 public。匿名克隆复验过：历史里不存在该文件，
+> 也不存在除 `f35.glb` 以外的任何 glTF 二进制。
+>
+> ⚠ 这里有个反直觉的坑，下次务必注意：**`filter-repo` + `push --force` 在 GitHub 上
+> 不等于删除。** GitHub 不回收强推后的悬空对象，旧 commit 仍能按 SHA 直取——
+> 当时实测完整下回了那 2,182,608 字节。最后是**删仓重建**才真正清掉的
+> （另一条官方途径是开 ticket 请 GitHub Support 跑 GC，要等几天）。
 
 ---
 
