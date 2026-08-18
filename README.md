@@ -2,7 +2,11 @@
 
 在网页里并排加载多个 3D 模型，同步转动，并用硬指标判断"哪个模型更好"。
 
+仓库：<https://github.com/zhuguangjun2002/model-viewer>（private）
+
 ```bash
+git clone https://github.com/zhuguangjun2002/model-viewer.git
+cd model-viewer
 npm install
 npm run dev
 ```
