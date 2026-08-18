@@ -31,7 +31,9 @@ await page.waitForFunction(
 // 面板上应有 3 行动画控件
 const panel = await page.evaluate(() => {
   const pane = document.querySelector('.pane');
-  const rows = [...pane.querySelectorAll('.parts-panel .part')];
+  // 必须限定 .anims：场景树面板（src/tree.js）也用 parts-panel 类名，
+  // 不限定的话会把树的 100 多行一起匹配进来，读到没有 range 的行就炸。
+  const rows = [...pane.querySelectorAll('.parts-panel.anims .part')];
   return rows.map((r) => ({
     label: r.querySelector('label').textContent,
     max: r.querySelector('input[type=range]').max,
@@ -112,6 +114,8 @@ console.log(allMoved && distinct
   ? '\n✅ 三段动画都能单独驱动，且驱动的部件不同'
   : '\n❌ 有动画没生效或无法区分');
 
+// 和 tilt/smoke 一样写项目根目录（.gitignore 挡着）。原来这里是某次会话的
+// 临时目录绝对路径，那目录一没就 ENOENT，判据全过了却报失败。
 await page.screenshot({ path: 'f35-anim.png' });
 console.log(errors.length ? `\n❌ 报错：\n${errors.join('\n')}` : '无 console 报错');
 await browser.close();
